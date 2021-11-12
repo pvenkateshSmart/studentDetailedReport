@@ -1,0 +1,763 @@
+<!doctype html>
+<html ng-app="touchstone">
+<head> 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js"></script> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+  <style>
+    @font-face {
+      font-family: 'Open Sans';
+      font-style: normal;
+      font-weight: 400;
+      font-stretch: normal;
+      src: url(https://fonts.gstatic.com/s/opensans/v27/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0B4gaVc.ttf) format('truetype');
+    }
+
+    @font-face {
+      font-family: 'Pinyon Script';
+      font-style: normal;
+      font-weight: 400;
+      src: url(https://fonts.gstatic.com/s/pinyonscript/v11/6xKpdSJbL9-e9LuoeQiDRQR8WOXaPw.ttf) format('truetype');
+    }
+
+    @font-face {
+      font-family: 'Rochester';
+      font-style: normal;
+      font-weight: 400;
+      src: url(https://fonts.gstatic.com/s/rochester/v11/6ae-4KCqVa4Zy6Fif-UC2FHS.ttf) format('truetype');
+    }
+
+    .cursive {
+      font-family: 'Pinyon Script', cursive;
+    }
+
+    .sans {
+      font-family: 'Open Sans', sans-serif;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .block {
+      display: block;
+    }
+
+    .underline {
+      border-bottom: 1px solid #777;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    .margin-0 {
+      margin: 0;
+    }
+
+    .padding-0 {
+      padding: 0;
+    }
+
+    .pm-empty-space {
+      height: 40px;
+      width: 100%;
+    }
+
+    body {
+      padding: 0px 0;
+      <!-- background: #ccc; -->
+    }
+
+    .pm-certificate-container {
+      position: relative;
+      padding: 30px;
+      color: #333;
+      font-family: 'Open Sans', sans-serif;
+      /*background: -webkit-repeating-linear-gradient(
+    45deg,
+    #618597,
+    #618597 1px,
+    #b2cad6 1px,
+    #b2cad6 2px
+  );
+  background: repeating-linear-gradient(
+    90deg,
+    #618597,
+    #618597 1px,
+    #b2cad6 1px,
+    #b2cad6 2px
+  );*/
+    }
+
+
+    .pm-certificate-container .pm-certificate-border .pm-certificate-block {
+
+      position: relative;
+
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certificate-header {
+      margin-bottom: 10px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certificate-title {
+      position: relative;
+      margin-top: -20px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certificate-title h2 {
+      font-size: 34px !important;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certificate-body {
+      padding: 20px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certificate-body .pm-name-text {
+      font-size: 20px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-earned {
+      margin: 15px 0 20px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-earned .pm-earned-text {
+      font-size: 20px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-earned .pm-credits-text {
+      font-size: 15px;
+	text-transform: capitalize;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-course-title .pm-earned-text {
+      font-size: 20px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-course-title .pm-credits-text {
+      font-size: 15px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certified {
+      font-size: 12px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certified .underline {
+      margin-bottom: 5px;
+    }
+
+    .pm-certificate-container .pm-certificate-border .pm-certificate-footer {
+
+      position: relative;
+
+    }
+
+    .cardheader {
+      background: url(./cardtop.jpg) no-repeat;
+      width: 819px;
+      height: 54px;
+      margin: 0px auto;
+    }
+
+    .cardbody {
+      background: url(./cardrepeat.jpg) repeat-y;
+      width: 819px;
+      margin: 0px auto;
+    }
+
+    .cardfooter {
+      background: url(./cardbottom.jpg) no-repeat;
+      width: 819px;
+      height: 54px;
+      margin: 0px auto;
+    }
+	@media all {
+ .page-break  { display: none; }
+}
+
+@media print {
+ .page-break  { display: block; page-break-before: always; }
+}
+ table { page-break-inside:auto }
+    tr    { page-break-inside:avoid; page-break-after:auto }
+
+  </style>
+</head>
+
+
+<script>
+ var app = angular.module('touchstone', []);
+app.controller('Attemptsummary', function($scope, $http,$filter,$window) {
+ 
+var url = new URL(window.location.href);
+//var papercode = url.searchParams.get("papercode");
+
+$scope.papercode=url.searchParams.get("papercode");
+$scope.succode=url.searchParams.get("succode");
+$scope.branch=url.searchParams.get("branch");
+$scope.name=url.searchParams.get("name");
+$scope.program=url.searchParams.get("program");
+
+//console.log($scope.papercode);
+
+
+
+	$scope.serverreport=function(paperCode,branch,suc){
+		$scope.showdiv=2;
+$scope.resstatus=0;
+$scope.currentpapercode=paperCode;
+ 
+			$http.get('http://exam.aditya.ac.in/touchstone/php/get_subjects_bypcode.php?act=getsubjects&paperCode='+paperCode).success(function(data){ 		
+			$scope.quepaper=data;			
+			$scope.subjects=getUniqeElements($scope.quepaper,'subject_master_name');
+			//console.log(branch);		
+			if(branch=='null'){
+				branch='';
+			}
+	  			 
+					$http.get('http://exam.aditya.ac.in/QRREPORT/studentresult.php?act=stdresult&paperCode='+paperCode+'&branch=').success(function(data){
+					//console.log(data);
+					
+					$scope.nofostudents=data.length;					
+					$scope.studenrresult=data;
+					//console.log($scope.studenrresult);
+					//var index = $scope.studenrresult.map(e => e.suc).indexOf(suc);
+						//console.log(suc);
+var ind = $scope.studenrresult.findIndex(function(item){ return item.suc == suc})
+
+					//console.log(ind);
+					$scope.SUBJECTTOTAL=0;
+						for(var i=0;i<$scope.subjects.length;i++){
+							$scope.SUBJECTTOTAL=$scope.SUBJECTTOTAL+($scope.studenrresult[0][$scope.subjects[i]+'_maxmarks']); 
+						}
+					
+					
+					$scope.MAXSCORE=Math.max.apply(Math, $scope.studenrresult.map(function(o) { return o.total; }));
+					//console.log($scope.MAXSCORE);
+					$scope.MINSCORE=Math.min.apply(Math, $scope.studenrresult.map(function(o) { return o.total; }));
+
+				
+				 $http.get('http://exam.aditya.ac.in/QRREPORT/get_qwise_report.php?act=strikerate&pcode='+paperCode+'&branch=').success(function(data){
+					 //console.log(data);
+					$scope.strikedata=data;	
+			 		  $scope.show_qwisereport($scope.currentpapercode,$scope.strikedata,$scope.studenrresult[ind],$scope.MAXSCORE,$scope.MINSCORE,$scope.nofostudents,$scope.quepaper,$scope.subjects,$scope.studenrresult.length,$scope.studenrresult);
+				});		 
+			});	 
+});
+				
+		}
+		
+		
+		$scope.show_qwisereport = function(pcode,strikedata,rowdata,mxscore,mnscore,nofostudents,qpepr,subs,nofstds,stdresultArr) {
+			 //console.log(rowdata);
+			$scope.showdiv=3;
+			 
+			/////////////////////////////////////////////////////////////////////////////
+				$scope.noof_q_answ_correct=0;$scope.rightmarks=0;
+				$scope.noof_q_answ_wrong=0;$scope.wrongmarks=0;
+				$scope.noof_q_attempted=0;$scope.attemptedmarks=0;
+				$scope.maximum_marks_test=0;
+				$scope.TOPCSCORE=0;
+				$scope.noof_q_answ_left=0;
+				$scope.leftmarks=0;
+				$scope.totaltimespent=0;
+				$scope.subobj=[];
+				$scope.totalnoofstudentsappered=nofstds;
+				$scope.testrank=rowdata.rank;
+				$scope.marlksscored=rowdata.total;
+				$scope.studentname=rowdata.studentname;
+				$scope.suc=rowdata.suc;
+				$scope.porgramname=rowdata.program;
+				$scope.examtyp=rowdata.examtype;
+				$scope.percentile=rowdata.percentile;				
+				$scope.AVGSCORE=Math.round((rowdata.total/stdresultArr.length)*100);
+				$scope.LEASTSCORE=stdresultArr[nofstds-1].total;
+				
+				 
+				$scope.ExamDatafor= $filter('date')(new Date(rowdata.attempteddate), 'dd-MM-yyyy');
+  
+				
+				$scope.AttemptQues=0; $scope.CorrectQues=0; $scope.AttemptRate=0; $scope.AccuracyRate=0;
+			 for(var s=0;s<subs.length;s++){
+				
+
+								$scope.maximum_marks_test=$scope.maximum_marks_test+rowdata[subs[s]+'_maxmarks'];
+
+								
+								$scope.noof_q_answ_correct=$scope.noof_q_answ_correct+rowdata['result'+subs[s]+'r'];
+								$scope.rightmarks=$scope.rightmarks+rowdata['studentmarks'+subs[s]+'r'];
+
+								$scope.noof_q_answ_wrong=$scope.noof_q_answ_wrong+rowdata['result'+subs[s]+'w'];
+								$scope.wrongmarks=$scope.wrongmarks+rowdata['studentmarks'+subs[s]+'w'];
+
+
+								$scope.noof_q_answ_left=$scope.noof_q_answ_left+rowdata['result'+subs[s]+'l'];
+								$scope.leftmarks=$scope.wrongmarks+rowdata['studentmarks'+subs[s]+'l'];
+
+
+								$scope.noof_q_attempted=$scope.noof_q_attempted+rowdata['result'+subs[s]+'r']+rowdata['result'+subs[s]+'w'];
+								$scope.attemptedmarks=$scope.attemptedmarks+rowdata['studentmarks'+subs[s]+'r']+rowdata['studentmarks'+subs[s]+'w'];
+
+								$scope.TOPCSCORE=$scope.TOPCSCORE+stdresultArr[0][subs[s]+'_marks'];
+ 
+								$scope.totaltimespent=$scope.totaltimespent+rowdata['timespent'+subs[s]+'r']+rowdata['timespent'+subs[s]+'w']+rowdata['timespent'+subs[s]+'l'];
+								//console.log($scope.totaltimespent);
+								//finder(Math.max, stdresultArr, 'total')
+								
+					  $scope.subobj[s]={
+								"Subject_name":subs[s],
+								"SUBJECTMAXMARKS":rowdata[subs[s]+'_maxmarks'],
+								"MARKSSCORED":rowdata[subs[s]+'_marks'],
+								"PERCENTAGE":((rowdata[subs[s]+'_marks']/rowdata[subs[s]+'_maxmarks'])*100),
+								"SUBJECTRANK":rowdata[subs[s]+'_rank'],
+								"HIHESTMARKS":finder(Math.max, stdresultArr, subs[s]+'_marks'),
+								"TOPPERSMARKS":stdresultArr[0][subs[s]+'_marks'],
+								"AVERAGEMARKS":((rowdata[subs[s]+'_marks']/nofstds)*100),
+								
+								"R":rowdata['result'+subs[s]+'r'],
+								"W":rowdata['result'+subs[s]+'w'],
+								"L":rowdata['result'+subs[s]+'l'],
+								"M":rowdata[subs[s]+'_marks'],
+								"Time":rowdata['timespent'+subs[s]+'r']+rowdata['timespent'+subs[s]+'w']+rowdata['timespent'+subs[s]+'l']
+					  };
+					 
+					  
+						$scope.AttemptQues=$scope.AttemptQues+ parseInt($scope.subobj[s].R+ $scope.subobj[s].W)
+						$scope.TotalQuestions=$scope.strikedata.length;
+						
+						$scope.CorrectQues=$scope.CorrectQues+ parseInt($scope.subobj[s].R);
+						$scope.AttemptRate=($scope.AttemptQues/$scope.TotalQuestions)*100;
+						$scope.AccuracyRate=($scope.CorrectQues/$scope.strikedata.length)*100;
+				  
+			}
+			 
+			  console.log($scope.subobj);
+			 ///////////////////////////////////////////////////////////////////////
+			$scope.MAXSCORE=mxscore;
+			$scope.MINSCORE=mnscore;
+			
+			
+			
+			$scope.studentname=rowdata.studentname;
+			$scope.MAXTOTAL=parseInt(rowdata.MATHEMATICS_maxmarks)+parseInt(rowdata.PHYSICS_maxmarks)+parseInt(rowdata.CHEMISTRY_maxmarks);
+			
+			//$scope.AVG=Math.round((rowdata.total/$scope.MAXTOTAL)*100);
+			
+			$scope.total=rowdata.total;
+			$scope.rank=rowdata.rank;
+			$scope.pcode=pcode;
+			$scope.percentile=Math.round(rowdata.percentile);
+			$scope.AVG=Math.round((rowdata.total/nofostudents)*100);
+			 
+			 
+			 $http.get('http://exam.aditya.ac.in/QRREPORT/get_qwise_report.php?act=qwise&pcode='+pcode+'&suc='+rowdata.suc).success(function(data){	
+					 //console.log(data);
+					 
+					
+					$scope.qwisedata=data;
+					$scope.noofquestiontest=$scope.qwisedata.length;
+					 var obj=[];$scope.setqwise=[];
+					 $scope.qpepr=qpepr;
+					 $scope.rightimpression=0;
+					for(var i=0;i<qpepr.length;i++){
+						 
+						 qpepr[i]['setdata']=$scope.qwisedata.filter(e=>e.questionid==qpepr[i]['question_master_id'])	
+						
+						 qpepr[i]['strdata']=strikedata.filter(e=>e.questionid==qpepr[i]['question_master_id'])	
+							if( qpepr[i]['strdata']!='')
+							{
+								qpepr[i]['setdata']['RPER']=qpepr[i]['strdata'][0]['R'];
+								qpepr[i]['setdata']['WPER']=qpepr[i]['strdata'][0]['W'];
+								//qpepr[i]['setdata']['ATTEM']=qpepr[i]['strdata'][0]['timespent'];
+								
+								qpepr[i]['setdata']['timespent']=qpepr[i]['strdata'][0]['timespent'];
+								qpepr[i]['setdata']['ATTEM']=parseInt(qpepr[i]['strdata'][0]['R'])+parseInt(qpepr[i]['strdata'][0]['W']);
+								
+								$scope.rightimpression=$scope.rightimpression+parseInt(qpepr[i]['strdata'][0]['R']);
+							}else{
+								qpepr[i]['setdata']['R']='-';
+								qpepr[i]['setdata']['W']='-';
+								qpepr[i]['setdata']['ATTEM']='-';
+								qpepr[i]['setdata']['timespent']='-';								
+							}
+							//$scope.setqwise.push(qpepr[i]['setdata']);
+					}
+				 	  //console.log(qpepr);
+					//  $scope.RightImression=$scope.rightimpression/$scope.qwisedata.length;
+					   var m;
+					   $scope.ta={};
+					   
+					   for(var i=0;i<subs.length;i++)
+					   {
+						   var count=0;
+							m=$scope.qpepr.filter(e=>e.subject_master_name===subs[i]);
+							// console.log(m[i].setdata['RPER']);
+							noques=0;
+							for(var j=0;j<m.length;j++)
+							{
+								//console.log(m[j].setdata['RPER']);
+								count=count+parseInt(m[j].setdata['RPER']);
+								 noques=noques+1;
+							}
+							
+							$scope.ta[i]=count/noques;
+					   }
+					   //console.log($scope.ta);
+			});
+			
+			$scope.getimpression=function(imp){
+				
+					if(imp<34)
+						return 'Hard';
+					else if(imp <66)
+						return 'Medium';
+					else
+						return 'Easy';
+					
+			}
+			
+			$scope.getquestion=function(qid)
+			{
+					$scope.showqid=qid;
+					$scope.qARR=$scope.qpepr.filter(e=>e.question_master_id==qid)	
+					//console.log($scope.qARR);
+			}
+			
+ $scope.resstatus=1;
+			
+			
+			
+		}
+	
+		function millisToMinutesAndSeconds(millis) {
+  var minutes = Math.floor(millis / 60000);
+  var seconds = ((millis % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+}
+function finder(cmp, arr, attr) {
+    var val = arr[0][attr];
+    for(var i=1;i<arr.length;i++) {
+        val = cmp(val, arr[i][attr])
+    }
+    return val;
+}
+	function sortByColumn(a, colIndex){
+
+    a.sort(sortFunction);
+
+    function sortFunction(a, b) {
+        if (a[colIndex] === b[colIndex]) {
+            return 0;
+        }
+        else {
+            return (a[colIndex] > b[colIndex]) ? -1 : 1;
+        }
+    }
+
+    return a;
+}	
+ function getUniqeElements(obj,field){
+    var elements=[];
+    for(var i in obj){
+        if(elements.indexOf(obj[i][field])==-1){
+            elements.push(obj[i][field]);
+        }
+    }
+    return elements;
+}
+	 function getSumElements(obj,field){
+   //console.log(obj);
+  var total=0;
+  for(var i in obj)
+      total+=Number(obj[i][field]); 
+  return total;
+}
+
+$scope.secondsToTime=function(secs)
+		{	
+			secs = Math.round(secs);
+			var hours = Math.floor(secs / (60 * 60));
+
+			var divisor_for_minutes = secs % (60 * 60);
+			var minutes = Math.floor(divisor_for_minutes / 60);
+
+			var divisor_for_seconds = divisor_for_minutes % 60;
+			var seconds = Math.ceil(divisor_for_seconds);
+			seconds=(seconds<10)?'0'+seconds:seconds;
+			minutes=(minutes<10)?'0'+minutes:minutes;
+			hours=(hours<10)?'0'+hours:hours;
+			
+			return hours+':'+minutes+':'+seconds;
+		}
+});
+
+ 
+ </script>
+ 
+<body translate="no" ng-controller="Attemptsummary">
+  <div class="container" >
+    <div class="cardheader"></div>
+    <div class="cardbody">
+      <div class="pm-certificate-container">
+
+
+        <div class="pm-certificate-border col-xs-12" style="margin-bottom:-50px">
+          <div class="row pm-certificate-header">
+            <div class="pm-certificate-title cursive col-xs-12 text-center">
+              <h2 style="font-size:50px !important;">Aditya Educational Institutions</h2>
+              <img src="emblom.png" height="80">
+            </div>
+          </div>
+          <div class="row pm-certificate-body">
+
+            <div class="pm-certificate-block">
+              <div class="col-xs-12">
+                <div class="row">
+		 <div class="col-xs-2">
+                    <!-- LEAVE EMPTY -->
+                  </div>
+                  <div class="pm-certificate-name underline margin-0 col-xs-8 text-center">
+                    <span class="pm-name-text bold">{{name}}</span>
+                  </div>
+                  <div class="col-xs-2">
+                    <!-- LEAVE EMPTY -->
+                  </div>
+                </div>
+              </div>
+
+
+              <p>&nbsp;</p>
+              <div class="col-xs-12">
+                <div class="row">
+                  <div class="col-xs-2">
+                    <!-- LEAVE EMPTY -->
+                  </div>
+                  <div class="pm-course-title col-xs-8 text-center">
+                    <h2 class="pm-certificate-title block cursive">Score Card</h2>
+                  </div>
+                  <div class="col-xs-2">
+                    <!-- LEAVE EMPTY -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xs-12">
+                <div class="row">
+                  <div class="col-xs-2">
+                    <!-- LEAVE EMPTY -->
+                  </div>
+                  <div class="pm-course-title col-xs-8 text-center">
+                    <span class="pm-credits-text block bold sans">{{porgramname}} MODEL EXAM CONDUCTED ON {{ExamDatafor}}</span>
+                  </div>
+                  <div class="col-xs-2">
+                    <!-- LEAVE EMPTY -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p>&nbsp;</p>
+            <div class="col-xs-12 form-group">
+
+              <div class="row">
+
+                <div class="pm-certificate-footer">
+                   <div class="col-md-12"> 
+			   <h4 class="pm-name-text underline block bold sans text-center" style="font-size:40px">
+				   <span class="text-muted">&#10003;</span> {{marlksscored}}<small>/{{maximum_marks_test}}</small>
+				    	<span>&#9130; {{(marlksscored/maximum_marks_test)*100 | number :2}}<small class="text-muted"><small>&#37;</small></small>
+					</span>
+				    </span>
+				   <span>&#9130; {{(totaltimespent/60) | number :0}}<small class="text-muted">/180<small> mins</small></small>
+			   </h4> 
+                   </div>
+                  <div class="col-xs-3 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name text-center">
+                      <span class="pm-name-text bold">{{AttemptQues}}<small class="text-muted"> /
+                          {{TotalQuestions}}</small></span>
+                    </div>
+                    <span class="bold block">Attempted</span>
+                  </div>
+                  <div class="col-xs-3 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name text-center">
+                      <span class="pm-name-text bold">{{CorrectQues}}<small
+                          class="text-muted fw-light">/{{AttemptQues}}</small></span>
+                    </div>
+                    <span class="bold block">Correct</span>
+                  </div>
+                  <div class="col-xs-3 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name text-center">
+                      <span class="pm-name-text bold">{{AttemptRate | number :2}}<small
+			    class="text-muted"><small> %</small></small></span>
+                    </div>
+                    <span class="bold block">Attempt Rate</span>
+                  </div>
+                  <div class="col-xs-3 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name text-center">
+                      <span class="pm-name-text bold">{{AccuracyRate | number :2}}<small
+                          class="text-muted"><small> %</small></small></span>
+                    </div>
+                    <span class="bold block">Accuracy Rate</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xs-12 form-group" ng-repeat="s in subobj">
+
+              <div class="row">
+
+                <div class="pm-certificate-footer">
+                  <div class="col-md-12">
+                    <h4 class="pm-credits-text underline  block bold sans" >{{s.Subject_name}}</h4>
+                  </div>
+                  <div class="col-xs-4 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name text-center">
+                      <span class="pm-name-text bold" >{{s.R}}<small class="text-muted"></small></span>
+                    </div>
+                    <span class="bold block">Right Answers</span>
+                  </div>
+                  <div class="col-xs-4 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name  text-center">
+                      <span class="pm-name-text bold" >{{s.W}}<small class="text-muted"></small></span>
+                    </div>
+                    <span class="bold block">Wrong Answers</span>
+                  </div>
+                  <div class="col-xs-4 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name  text-center">
+                      <span class="pm-name-text bold" >{{s.L}}<small class="text-muted"> /
+                          {{(s.R)+(s.W)+(s.L)}}</small></span>
+                    </div>
+                    <span class="bold block">Not Attempted</span>
+                  </div>
+
+                  <p>&nbsp;</p>
+
+                  <div class="col-xs-4 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name  text-center">
+                      <span class="pm-name-text bold">{{s.M}}<small class="text-muted">/{{s.SUBJECTMAXMARKS}}</small></span>
+                    </div>
+                    <span class="bold block">Marks</span>
+                  </div>
+                  <div class="col-xs-4 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name  text-center">
+			    <span class="pm-name-text bold">{{s.Time/60 | number :2}}<small class="text-muted"><small> mins</small></small></span>
+                    </div>
+                    <span class="bold block">Time Taken</span>
+                  </div>
+                  <div class="col-xs-4 pm-certified col-xs-4 text-center">
+                    <div class="pm-certificate-name  text-center">
+			    <span class="pm-name-text bold">{{(s.Time/60)/(s.R+s.W+s.L) | number :2}} <small class="text-muted"><small>Q/min</small></small></span>
+                    </div>
+                    <span class="bold block">Speed</span>
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+
+
+            
+          </div>
+
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+    <div class="cardfooter"></div>
+ 
+  
+  <p>&nbsp;</p><p>&nbsp;</p>
+   <div id="qwisereport" style="background-color:white;" class="col-md-12" ng-init="serverreport(papercode,branch,succode)";>			 
+					 <table class="table table-responsive table-striped">
+					 <tr>
+					 <td colspan="6"><h4>Detailed Report</h4></td>
+					 </tr>
+					 <tr>
+						<td>Name of the Student</td><td>{{studentname}}</td>
+						<td>Marks</td>	<td>{{marlksscored}}/{{maximum_marks_test}}   ({{(marlksscored/maximum_marks_test)*100 | number :2}}%)</td>
+						<td>No of Questions</td><td>{{noofquestiontest}}</td>				 
+					 </tr>
+					 <tr>
+						 <td>SUC</td><td>{{suc}}</td>			 
+						 <td>Rank / Percentile</td><td>{{testrank}} &nbsp;/&nbsp; {{percentile}}</td>	
+						 <td>Right / Marks</td><td>{{noof_q_answ_correct}} / {{rightmarks}}</td>	
+											 
+					 </tr>
+					 <tr>				
+						<td>Date Of Exam</td><td>24-09-2019</td>			 
+						<td>Top Mark</td><td>{{TOPCSCORE}}</td>
+						<td>Wrong / Marks</td><td>{{noof_q_answ_wrong}} / {{wrongmarks}}</td>
+										
+					 </tr>
+					<tr>
+						<td>Model</td><td>{{porgramname}}</td>
+						<td>Avg Mark</td><td>{{AVGSCORE}}</td>	
+						<td>Left</td><td>{{noof_q_answ_left}}</td>								
+					 </tr>
+					 <tr>
+						<td>Type</td><td >{{examtyp|uppercase}}:&nbsp;<span ng-if="examtyp=='Online'">{{(totaltimespent/60) | number :0}} Min</span></td>
+						<td>Least Mark</td><td>{{LEASTSCORE}}</td>
+						<td>Level Student/Others</td><td>{{getimpression((noof_q_answ_correct/noofquestiontest)*100)}} / {{getimpression((rightimpression/noofquestiontest))}}</td>			
+					 </tr>			 
+					 </table>
+			 
+			 
+			  <div class="row">
+			  <div class="col-md-12"><h4>Subject wise analysis</h4></div>
+				<div class="col-md-4" ng-repeat="s in subobj">
+					<table class="table table-striped table-sm" >
+					<tr><td><b>{{s.Subject_name}}</b></td><td>{{s.MARKSSCORED}} / {{s.SUBJECTMAXMARKS}} ({{s.PERCENTAGE | number:0}}%) Rank : {{s.SUBJECTRANK}}</td> </tr>
+						<tr><td>Highest Mark</td><td>{{s.HIHESTMARKS}}</td></tr>
+						<tr><td>Topper's Mark</td><td>{{s.TOPPERSMARKS}}</td></tr>
+						<tr><td>Average Mark</td><td>{{s.AVERAGEMARKS | number :0}}</td></tr>
+						<tr><td>Level Student/Others</td><td>{{getimpression(s.PERCENTAGE)}} / {{getimpression((ta[$index]))}}</td></tr>
+					</table>				
+				</div>
+			 </div>
+
+
+ 
+ 
+				  <table class="table table-bordered table-responsive table-striped" style="font-size:11px;" border="1" id="example4" style="font-size:12px;">
+				  <thead><th colspan="12"><h4>Question wise analysis</h4></th></thead>
+					<thead class="bg-blue">
+					<tr class="bg-blue">
+					<th class="text-center">#</th>					 
+					<th class="text-center">Subject</th>	
+					<th class="text-center">Topic</th>
+					<th class="text-center">Qtype</th>
+ 					<th class="text-center">TIME</th>					
+					<th class="text-center">QM</th>
+					<th class="text-center">Result</th>
+					<th class="text-center">Marks</th>
+					<th class="text-center">ATT%</th>					
+					<th class="text-center">R%</th>					
+					<th class="text-center">W%</th>		
+					<th class="text-center">Level</th>			
+					</tr>
+					</thead> 
+						<tbody ng-repeat="y in qpepr">						 
+						<tr>						
+							<td class="text-center" style="cursor:pointer;"  ng-click="getquestion(y.question_master_id);" >{{$index+1}}</td>					
+							<td>{{y.subject_master_name}}</td>						
+							<td ng-if="y.setdata[0].topicname!=null">{{y.setdata[0].topicname}} -{{y.setdata[0].subtopicname}}</td>
+							<td ng-if="y.setdata[0].topicname==null">{{y.topic_master_name}} -{{y.setdata[0].subtopicname}}</td>
+							<td>{{y.setdata[0].qtype}}</td>	
+							<td class="text-center">{{ (y.setdata[0].timespent)/60 | number :2}}</td> 	
+							<td class="text-center">{{y.setdata[0].questionmarks}}</td> 						 
+							<td class="text-center">{{y.setdata[0].result | uppercase}}</td>
+							<td class="text-center">{{y.setdata[0].studentmarks}}</td>
+							<td class="text-center">{{y.setdata.ATTEM}}</td>
+							<td class="text-center">{{y.setdata.RPER}}</td>
+							<td class="text-center">{{y.setdata.WPER}}</td>
+							<td class="text-center">{{getimpression(y.setdata.RPER)}}</td>		
+						</tr>							 
+						</tbody>
+					</table>
+				  </div>
+				  
+				  
+	 </div>			  
+   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
+</body>
+</html>
